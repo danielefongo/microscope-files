@@ -65,7 +65,7 @@ end
 function files.vimgrep(text)
   return {
     command = "rg",
-    args = { "--vimgrep", "-M", 200, text },
+    args = { "--vimgrep", "-S", "-M", 200, text },
     parser = function(data)
       local elements = vim.split(data.text, ":", {})
 
@@ -82,7 +82,7 @@ end
 function files.buffergrep(text, filename)
   return {
     command = "rg",
-    args = { "--vimgrep", "-M", 200, text, filename },
+    args = { "--vimgrep", "-S", "-M", 200, text, filename },
     parser = function(data)
       local elements = vim.split(data.text, ":", {})
 
