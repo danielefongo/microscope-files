@@ -15,7 +15,7 @@ return {
     open = open,
     preview = preview.cat,
     chain = function(text)
-      return { file_lists.all_lines(), lists.fzf(text) }
+      return { file_lists.all_lines(), lists.fzf(text), lists.head(100) }
     end,
   },
   buffer_grep = {
