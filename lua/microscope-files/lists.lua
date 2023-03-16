@@ -1,5 +1,26 @@
 local utils = require("microscope-files.utils")
+local highlight = require("microscope.highlight")
+local constants = require("microscope.constants")
 local files = {}
+
+local function highlight_file_cursor(highlights, text, query)
+  query = query or ""
+  return highlight
+    .new(highlights, text)
+    :hl_match(constants.color.color1, "(.*:)(%d+:%d+:)(.*)", 1)
+    :hl_match(constants.color.color2, "(.*:)(%d+:%d+:)(.*)", 2)
+    :hl_match(constants.color.match, "(.*)(%d+:%d+:)(.*)(" .. query .. ")(.*)", 4)
+    :get_highlights()
+end
+
+local function highlight_cursor(highlights, text, query)
+  query = query or ""
+  return highlight
+    .new(highlights, text)
+    :hl_match(constants.color.color2, "(%d+:%d+:)(.*)", 1)
+    :hl_match(constants.color.match, "(%d+:%d+:)(.*)(" .. query .. ")(.*)", 3)
+    :get_highlights()
+end
 
 function files.rg()
   return {
@@ -23,6 +44,7 @@ function files.buffer_lines(filename)
 
       return {
         text = utils.relative(data.text),
+        highlights = highlight_cursor(data.highlights, data.text),
         file = filename,
         row = tonumber(elements[1]),
         col = tonumber(elements[2]),
@@ -37,9 +59,11 @@ function files.all_lines()
     args = { "--color", "never", "--line-number", "--column", "" },
     parser = function(data)
       local elements = vim.split(data.text, ":", {})
+      local limited_path = utils.relative(data.text)
 
       return {
-        text = utils.relative(data.text),
+        text = limited_path,
+        highlights = highlight_file_cursor(data.highlights, limited_path),
         file = elements[1],
         row = tonumber(elements[2]),
         col = tonumber(elements[3]),
@@ -68,9 +92,11 @@ function files.vimgrep(text)
     args = { "--vimgrep", "-S", "-M", 200, text },
     parser = function(data)
       local elements = vim.split(data.text, ":", {})
+      local limited_path = utils.relative(data.text)
 
       return {
-        text = utils.relative(data.text),
+        text = limited_path,
+        highlights = highlight_file_cursor(data.highlights, limited_path, text),
         file = elements[1],
         row = tonumber(elements[2]),
         col = tonumber(elements[3]),
@@ -82,15 +108,16 @@ end
 function files.buffergrep(text, filename)
   return {
     command = "rg",
-    args = { "--vimgrep", "-S", "-M", 200, text, filename },
+    args = { "--vimgrep", "--no-filename", "-S", "-M", 200, text, filename },
     parser = function(data)
       local elements = vim.split(data.text, ":", {})
 
       return {
-        text = string.format("%s:%s: %s", elements[2], elements[3], elements[4]),
-        file = elements[1],
-        row = tonumber(elements[2]),
-        col = tonumber(elements[3]),
+        text = data.text,
+        highlights = highlight_cursor(data.highlights, data.text, text),
+        file = filename,
+        row = tonumber(elements[1]),
+        col = tonumber(elements[2]),
       }
     end,
   }
