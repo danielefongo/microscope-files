@@ -1,6 +1,6 @@
 return {
   finders = require("microscope-files.finders"),
-  lists = require("microscope-files.lists"),
+  steps = require("microscope-files.steps"),
   preview = require("microscope-files.preview"),
   open = require("microscope-files.open"),
 }
