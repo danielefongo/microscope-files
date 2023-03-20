@@ -5,6 +5,8 @@ local utils = require("microscope-files.utils")
 local preview = {}
 
 function preview.cat(data, window)
+  assert(data.file, "Provide file field")
+
   local cursor
   if data.col and data.row then
     cursor = { data.row, data.col }

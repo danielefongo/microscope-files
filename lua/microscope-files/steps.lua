@@ -41,6 +41,7 @@ function files.buffer_lines(filename)
     args = { "--no-filename", "--color", "never", "--line-number", "--column", "", filename },
     parser = function(data)
       local elements = vim.split(data.text, ":", {})
+      local line_text = string.gsub(data.text, table.concat({ elements[1], elements[2] }, ":"), "")
 
       return {
         text = utils.relative(data.text),
@@ -48,6 +49,7 @@ function files.buffer_lines(filename)
         file = filename,
         row = tonumber(elements[1]),
         col = tonumber(elements[2]),
+        line_text = line_text,
       }
     end,
   }
@@ -60,6 +62,7 @@ function files.all_lines()
     parser = function(data)
       local elements = vim.split(data.text, ":", {})
       local limited_path = utils.relative(data.text)
+      local line_text = string.gsub(data.text, table.concat({ elements[1], elements[2], elements[3] }, ":"), "")
 
       return {
         text = limited_path,
@@ -67,6 +70,7 @@ function files.all_lines()
         file = elements[1],
         row = tonumber(elements[2]),
         col = tonumber(elements[3]),
+        line_text = line_text,
       }
     end,
   }
@@ -93,6 +97,7 @@ function files.vimgrep(text)
     parser = function(data)
       local elements = vim.split(data.text, ":", {})
       local limited_path = utils.relative(data.text)
+      local line_text = string.gsub(data.text, table.concat({ elements[1], elements[2], elements[3] }, ":"), "")
 
       return {
         text = limited_path,
@@ -100,6 +105,7 @@ function files.vimgrep(text)
         file = elements[1],
         row = tonumber(elements[2]),
         col = tonumber(elements[3]),
+        line_text = line_text,
       }
     end,
   }
@@ -111,6 +117,7 @@ function files.buffergrep(text, filename)
     args = { "--vimgrep", "--no-filename", "-S", "-M", 200, text, filename },
     parser = function(data)
       local elements = vim.split(data.text, ":", {})
+      local line_text = string.gsub(data.text, table.concat({ elements[1], elements[2] }, ":"), "")
 
       return {
         text = data.text,
@@ -118,6 +125,7 @@ function files.buffergrep(text, filename)
         file = filename,
         row = tonumber(elements[1]),
         col = tonumber(elements[2]),
+        line_text = line_text,
       }
     end,
   }
