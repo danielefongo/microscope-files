@@ -55,10 +55,33 @@ function files.buffer_lines(filename)
   }
 end
 
-function files.all_lines()
+function files.prefiltered_all_lines(text)
+  local prefilter = ""
+  if #text > 0 then
+    local new_word = true
+    prefilter = "("
+    for text_idx = 1, #text, 1 do
+      local char = string.sub(text, text_idx, text_idx)
+      if string.match(char, "[%.%+%*%?%^%$%(%)%[%]%{%}%|%\\]") then
+        char = "\\" .. char
+      end
+
+      if new_word then
+        prefilter = prefilter .. char
+        new_word = false
+      elseif string.sub(text, text_idx, text_idx) == " " then
+        prefilter = prefilter .. "|"
+        new_word = true
+      else
+        prefilter = prefilter .. ".*" .. char
+      end
+    end
+    prefilter = prefilter .. ")"
+  end
+
   return {
     command = "rg",
-    args = { "--color", "never", "--line-number", "--column", "" },
+    args = { "--color", "never", "--line-number", "--column", "--vimgrep", prefilter },
     parser = function(data)
       local elements = vim.split(data.text, ":", {})
       local limited_path = utils.relative(data.text)

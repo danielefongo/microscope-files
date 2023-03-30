@@ -15,7 +15,7 @@ return {
     open = open,
     preview = preview.cat,
     chain = function(text)
-      return { file_steps.all_lines(), steps.fzf(text), steps.head(100) }
+      return { file_steps.prefiltered_all_lines(text), steps.fzf(text), steps.head(100) }
     end,
   },
   buffer_grep = {
