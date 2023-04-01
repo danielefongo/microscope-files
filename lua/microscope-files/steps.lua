@@ -57,6 +57,8 @@ end
 
 function files.prefiltered_all_lines(text)
   local prefilter = ""
+
+  text = text:gsub("%s+", " ")
   if #text > 0 then
     local new_word = true
     prefilter = "("
