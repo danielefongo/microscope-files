@@ -25,13 +25,13 @@ return {
     parsers = { file_parsers.row_col, file_parsers.regex },
   },
   buffer_fuzzy = {
-    lens = lenses.head(100, lenses.fzf(file_lenses.buffer_lines())),
+    lens = lenses.head(100, lenses.fzf(lenses.cache(file_lenses.buffer_lines()))),
     open = open,
     preview = preview.cat,
     parsers = { file_parsers.row_col, parsers.fuzzy },
   },
   file = {
-    lens = lenses.head(100, lenses.fzf(file_lenses.rg())),
+    lens = lenses.head(100, lenses.fzf(lenses.cache(file_lenses.rg()))),
     open = open,
     preview = preview.cat,
     parsers = { file_parsers.file, parsers.fuzzy },
