@@ -49,8 +49,8 @@ function parsers.regex(data, request)
   local query = request.text or ""
 
   data.highlights = highlight
-    .new(data.highlights, data.text)
-    :hl_match(highlight.color.match, "(.*)(%d+:%d+:)(.*)(" .. query .. ")(.*)", 4)
+    .new(data.highlights, data.text:lower())
+    :hl_match(highlight.color.match, "(.*)(%d+:%d+:)(.*)(" .. query:lower() .. ")(.*)", 4)
     :get_highlights()
 
   return data

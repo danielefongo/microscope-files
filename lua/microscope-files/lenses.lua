@@ -1,5 +1,3 @@
-local command = require("microscope.api.command")
-local scheduled = require("microscope.api.scheduled")
 local files = {}
 
 function files.rg()
