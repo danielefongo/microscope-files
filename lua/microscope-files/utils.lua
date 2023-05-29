@@ -29,7 +29,8 @@ function utils.is_binary(path)
 end
 
 function utils.relative(path)
-  return string.gsub(path, vim.fn.getcwd() .. "/", "")
+  local current_path = vim.fn.getcwd():gsub("[%-%.%+%[%]%(%)%$%^%%%?%*]", "%%%1") .. "/"
+  return string.gsub(path, current_path, "")
 end
 
 return utils
