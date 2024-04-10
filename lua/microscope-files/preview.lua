@@ -36,7 +36,7 @@ function preview.cat(data, window)
   preview.scope = scope.new({
     lens = {
       fun = function(flow, text)
-        flow.spawn({ cmd = "cat", args = { text } })
+        flow.cmd.shell("cat", { text }):into(flow)
       end,
     },
     callback = function(lines, text)

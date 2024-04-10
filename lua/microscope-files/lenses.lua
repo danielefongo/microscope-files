@@ -3,10 +3,7 @@ local files = {}
 function files.rg()
   return {
     fun = function(flow)
-      flow.spawn({
-        cmd = "rg",
-        args = { "--files" },
-      })
+      flow.cmd.shell("rg", { "--files" }):into(flow)
     end,
   }
 end
@@ -14,11 +11,10 @@ end
 function files.buffer_lines()
   return {
     fun = function(flow, request)
-      local filename = flow.fn(vim.api.nvim_buf_get_name, request.buf)
-      flow.spawn({
-        cmd = "rg",
-        args = { "--no-filename", "--color", "never", "--line-number", "--column", "", filename },
-      })
+      local filename = flow.cmd.fn(vim.api.nvim_buf_get_name, request.buf):collect()
+      flow.cmd
+        .shell("rg", { "--no-filename", "--color", "never", "--line-number", "--column", "", filename })
+        :into(flow)
     end,
   }
 end
@@ -30,7 +26,7 @@ function files.prefiltered_all_lines()
 
       if #text < 3 then
         context.cache = nil
-        return flow.spawn({ cmd = "echo" })
+        return flow.cmd.shell("echo"):into(flow)
       end
 
       if context.cache then
@@ -59,11 +55,8 @@ function files.prefiltered_all_lines()
       end
       prefilter = prefilter .. ")"
 
-      context.cache = flow.command({
-        cmd = "rg",
-        args = { "--color", "never", "--line-number", "--column", "-M", 200, "-S", prefilter },
-      })
-
+      context.cache =
+        flow.cmd.shell("rg", { "--color", "never", "--line-number", "--column", "-M", 200, "-S", prefilter }):collect()
       flow.write(context.cache)
     end,
   }
@@ -72,10 +65,7 @@ end
 function files.vimgrep()
   return {
     fun = function(flow, request)
-      flow.spawn({
-        cmd = "rg",
-        args = { "--vimgrep", "-S", "-M", 200, request.text },
-      })
+      flow.cmd.shell("rg", { "--vimgrep", "-S", "-M", 200, request.text }):into(flow)
     end,
   }
 end
@@ -83,11 +73,8 @@ end
 function files.buffergrep()
   return {
     fun = function(flow, request)
-      local filename = flow.fn(vim.api.nvim_buf_get_name, request.buf)
-      flow.spawn({
-        cmd = "rg",
-        args = { "--vimgrep", "--no-filename", "-S", "-M", 200, request.text, filename },
-      })
+      local filename = flow.cmd.fn(vim.api.nvim_buf_get_name, request.buf):collect()
+      flow.cmd.shell("rg", { "--vimgrep", "--no-filename", "-s", "-m", 200, request.text, filename }):into(flow)
     end,
   }
 end
