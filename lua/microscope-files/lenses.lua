@@ -21,16 +21,11 @@ end
 
 function files.prefiltered_all_lines()
   return {
-    fun = function(flow, request, context)
+    fun = function(flow, request)
       local text = request.text:gsub("%s+", " ")
 
       if #text < 3 then
-        context.cache = nil
-        return flow.cmd.shell("echo"):into(flow)
-      end
-
-      if context.cache then
-        return flow.write(context.cache)
+        return flow.write("")
       end
 
       local prefilter = ""
@@ -47,7 +42,7 @@ function files.prefiltered_all_lines()
           prefilter = prefilter .. char
           new_word = false
         elseif string.sub(text, text_idx, text_idx) == " " then
-          prefilter = prefilter .. "|"
+          prefilter = prefilter .. ")|("
           new_word = true
         else
           prefilter = prefilter .. ".*" .. char
@@ -55,9 +50,7 @@ function files.prefiltered_all_lines()
       end
       prefilter = prefilter .. ")"
 
-      context.cache =
-        flow.cmd.shell("rg", { "--color", "never", "--line-number", "--column", "-M", 200, "-S", prefilter }):collect()
-      flow.write(context.cache)
+      flow.cmd.shell("rg", { "--color", "never", "--line-number", "--column", "-M", 200, "-S", prefilter }):into(flow)
     end,
   }
 end
