@@ -7,31 +7,33 @@ local parsers = require("microscope.builtin.parsers")
 
 return {
   workspace_grep = {
-    lens = lenses.head(5000, file_lenses.vimgrep()),
+    lens = lenses.head(file_lenses.vimgrep()),
     open = open,
     preview = preview.cat,
     parsers = { file_parsers.file_row_col, file_parsers.regex },
   },
   workspace_fuzzy = {
-    lens = lenses.head(500, lenses.fzf(file_lenses.prefiltered_all_lines())),
+    lens = lenses.head(lenses.fzf(file_lenses.prefiltered_all_lines())),
     open = open,
     preview = preview.cat,
     parsers = { file_parsers.file_row_col, parsers.fuzzy },
+    args = { limit = 500 },
   },
   buffer_grep = {
-    lens = lenses.head(5000, file_lenses.buffergrep()),
+    lens = lenses.head(file_lenses.buffergrep()),
     open = open,
     preview = preview.cat,
     parsers = { file_parsers.row_col, file_parsers.regex },
   },
   buffer_fuzzy = {
-    lens = lenses.head(500, lenses.fzf(lenses.cache(file_lenses.buffer_lines()))),
+    lens = lenses.head(lenses.fzf(lenses.cache(file_lenses.buffer_lines()))),
     open = open,
     preview = preview.cat,
     parsers = { file_parsers.row_col, parsers.fuzzy },
+    args = { limit = 500 },
   },
   file = {
-    lens = lenses.head(5000, lenses.fzf(lenses.cache(file_lenses.rg()))),
+    lens = lenses.head(lenses.fzf(lenses.cache(file_lenses.rg()))),
     open = open,
     preview = preview.cat,
     parsers = { file_parsers.file, parsers.fuzzy },
