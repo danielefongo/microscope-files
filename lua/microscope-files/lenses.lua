@@ -11,7 +11,7 @@ end
 function files.buffer_lines()
   return {
     fun = function(flow, request)
-      local filename = flow.cmd.fn(vim.api.nvim_buf_get_name, request.buf):collect()
+      local filename = flow.cmd.fn(vim.api.nvim_buf_get_name, request.buf):collect(flow)
       flow.cmd
         .shell("rg", { "--no-filename", "--color", "never", "--line-number", "--column", "", filename })
         :into(flow)
@@ -66,7 +66,7 @@ end
 function files.buffergrep()
   return {
     fun = function(flow, request)
-      local filename = flow.cmd.fn(vim.api.nvim_buf_get_name, request.buf):collect()
+      local filename = flow.cmd.fn(vim.api.nvim_buf_get_name, request.buf):collect(flow)
       flow.cmd.shell("rg", { "--vimgrep", "--no-filename", "-s", "-m", 200, request.text, filename }):into(flow)
     end,
   }
