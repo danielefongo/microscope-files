@@ -3,7 +3,7 @@ local files = {}
 function files.rg()
   return {
     fun = function(flow)
-      flow.cmd.shell("rg", { "--files" }):into(flow)
+      flow.consume(flow.cmd.shell("rg", { "--files" }))
     end,
   }
 end
@@ -11,10 +11,11 @@ end
 function files.buffer_lines()
   return {
     fun = function(flow, request)
-      local filename = flow.cmd.fn(vim.api.nvim_buf_get_name, request.buf):collect(flow)
-      flow.cmd
-        .shell("rg", { "--no-filename", "--color", "never", "--line-number", "--column", "", filename })
-        :into(flow)
+      flow.consume(
+        flow.cmd
+          .fn(vim.api.nvim_buf_get_name, request.buf)
+          :pipe("xargs", { "rg", "--no-filename", "--color", "never", "--line-number", "--column", "" })
+      )
     end,
   }
 end
@@ -50,7 +51,9 @@ function files.prefiltered_all_lines()
       end
       prefilter = prefilter .. ")"
 
-      flow.cmd.shell("rg", { "--color", "never", "--line-number", "--column", "-M", 200, "-S", prefilter }):into(flow)
+      flow.consume(
+        flow.cmd.shell("rg", { "--color", "never", "--line-number", "--column", "-M", 200, "-S", prefilter })
+      )
     end,
   }
 end
@@ -61,7 +64,8 @@ function files.vimgrep()
       if request.text == "" then
         return flow.write("")
       end
-      flow.cmd.shell("rg", { "--vimgrep", "-S", "-M", 200, request.text }):into(flow)
+
+      flow.consume(flow.cmd.shell("rg", { "--vimgrep", "-S", "-M", 200, request.text }))
     end,
   }
 end
@@ -72,8 +76,11 @@ function files.buffergrep()
       if request.text == "" then
         return flow.write("")
       end
-      local filename = flow.cmd.fn(vim.api.nvim_buf_get_name, request.buf):collect(flow)
-      flow.cmd.shell("rg", { "--vimgrep", "--no-filename", "-s", "-m", 200, request.text, filename }):into(flow)
+      flow.consume(
+        flow.cmd
+          .fn(vim.api.nvim_buf_get_name, request.buf)
+          :pipe("xargs", { "rg", "--vimgrep", "--no-filename", "-s", "-m", 200, request.text })
+      )
     end,
   }
 end
