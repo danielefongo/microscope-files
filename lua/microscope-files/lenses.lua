@@ -58,6 +58,9 @@ end
 function files.vimgrep()
   return {
     fun = function(flow, request)
+      if request.text == "" then
+        return flow.write("")
+      end
       flow.cmd.shell("rg", { "--vimgrep", "-S", "-M", 200, request.text }):into(flow)
     end,
   }
@@ -66,6 +69,9 @@ end
 function files.buffergrep()
   return {
     fun = function(flow, request)
+      if request.text == "" then
+        return flow.write("")
+      end
       local filename = flow.cmd.fn(vim.api.nvim_buf_get_name, request.buf):collect(flow)
       flow.cmd.shell("rg", { "--vimgrep", "--no-filename", "-s", "-m", 200, request.text, filename }):into(flow)
     end,
