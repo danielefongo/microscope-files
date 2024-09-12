@@ -1,10 +1,18 @@
 local files = {}
 
+local function extend_args(args, extra_args)
+  if extra_args.hidden then
+    table.insert(args, 1, "--hidden")
+  end
+  return args
+end
+
 function files.rg()
   return {
-    fun = function(flow)
-      flow.consume(flow.cmd.shell("rg", { "--files" }))
+    fun = function(flow, _, args)
+      flow.consume(flow.cmd.shell("rg", extend_args({ "--files" }, args)))
     end,
+    args = { hidden = false },
   }
 end
 
@@ -22,7 +30,7 @@ end
 
 function files.prefiltered_all_lines()
   return {
-    fun = function(flow, request)
+    fun = function(flow, request, args)
       local text = request.text:gsub("%s+", " ")
 
       if #text < 3 then
@@ -52,7 +60,10 @@ function files.prefiltered_all_lines()
       prefilter = prefilter .. ")"
 
       flow.consume(
-        flow.cmd.shell("rg", { "--color", "never", "--line-number", "--column", "-M", 200, "-S", prefilter })
+        flow.cmd.shell(
+          "rg",
+          extend_args({ "--color", "never", "--line-number", "--column", "-M", 200, "-S", prefilter }, args)
+        )
       )
     end,
   }
@@ -60,12 +71,12 @@ end
 
 function files.vimgrep()
   return {
-    fun = function(flow, request)
+    fun = function(flow, request, args)
       if request.text == "" then
         return flow.write("")
       end
 
-      flow.consume(flow.cmd.shell("rg", { "--vimgrep", "-S", "-M", 200, request.text }))
+      flow.consume(flow.cmd.shell("rg", extend_args({ "--vimgrep", "-S", "-M", 200, request.text }, args)))
     end,
   }
 end

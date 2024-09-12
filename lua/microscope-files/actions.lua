@@ -12,4 +12,14 @@ function actions.quickfix(microscope)
   vim.api.nvim_command("copen")
 end
 
+function actions.toggle_hidden(microscope)
+  microscope:alter(function(opts)
+    if opts.args.hidden == nil then
+      opts.args.hidden = false
+    end
+    opts.args.hidden = not opts.args.hidden
+    return opts
+  end)
+end
+
 return actions
