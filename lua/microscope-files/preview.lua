@@ -47,7 +47,9 @@ function preview.cat(data, window)
       window:set_buf_hls(hls)
       window:set_cursor(cursor)
       if cursor[2] > 0 then
-        window:set_buf_hl("Search", cursor[1], cursor[2], cursor[2])
+        window:set_buf_hls({
+          [cursor[1]] = { color = "Search", from = cursor[2], to = cursor[2] },
+        })
       end
     end,
   })
